@@ -30,7 +30,7 @@ window.onload = function(){
                 text($month,month);
                 text($day,day);
                 showTime(future);
-                setInterval(function(){
+                var timer = setInterval(function(){
                     showTime(future);
                 }, 1000);
             }
@@ -54,5 +54,7 @@ window.onload = function(){
         text($hours,hours);
         text($minutes,minutes);
         text($seconds,seconds);
+
+        if(days===0&&hours===0&&minutes===0&&seconds===0){clearInterval(timer);}
     }
 }

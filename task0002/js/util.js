@@ -231,6 +231,8 @@ function $(selector) {
                 if(all[i].getAttribute(key)===value){return all[i];}
             }
         }         
+    }else{
+        return document.getElementsByTagName(selector)[0];
     }
 }
 
@@ -355,4 +357,11 @@ function text(element, str){
             element.appendChild(textNode);
         }
     }
+}
+
+/* 阻止默认事件 */
+function cancelHandle(e){
+    if(e.preventDefault){e.preventDefault();}
+    if(e.returnValue){e.returnValue = false;}
+    return false;
 }
