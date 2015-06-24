@@ -2,9 +2,9 @@ var gulp = require('gulp');
 
 var jshint = require('gulp-jshint');
 var autoprefixer = require('gulp-autoprefixer');
-var clean = require('gulp-clean');
 var notify = require('gulp-notify');
 var minifycss = require('gulp-minify-css');
+var livereload = require('gulp-livereload');
 
 gulp.task('lint', function(){
     gulp.src('./task001/js/*.js')
@@ -19,7 +19,12 @@ gulp.task('style', function(){
         .pipe(notify({ message: 'Styles task complete.' }));
 });
 
-gulp.task('watch', function(){
-    gulp.watch('./task001/*.css', ['style']);
-    
+gulp.task('watch', function() {
+
+    var server = livereload();
+
+    gulp.watch(['task0003/**/*.*']).on('change', function(file) {
+        server.changed(file.path);
+    });
+
 });

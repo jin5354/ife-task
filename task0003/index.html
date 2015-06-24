@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GTD tools</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/html5shiv.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/task0003.js"></script>
+</head>
+<body>
+    <div class="content-wrapper">
+        <header class="header">GTD Tools</header>
+        <div class="article">
+            <div class="cates">
+                <p class="all">所有任务(<span class="all-num"></span>)</p>
+                <p class="info">分类列表</p>
+                <div class="cates-wrapper"></div>
+                <p class="add-cate"><span class="add-ico icon"></span><span>新增分类</span></p>
+            </div>
+            <div class="tasks">
+                <div class="nav">
+                    <ul>
+                        <li class="active all">所有</li>
+                        <li class="unfinished">未完成</li>
+                        <li class="finished">已完成</li>
+                    </ul>
+                </div>
+                <div class="tasks-wrapper"></div>
+                <p class="add-task"><span class="add-ico icon"></span><span>新增任务</span></p>
+            </div>
+            <div class="details">
+                <div class="task-title"><p><span class="task-title-text"></span><input type="text" placeholder="请输入标题" class="task-title-input"><span class="edit-ico icon"></span><span class="finish-ico icon"></p></div>
+                <p class="task-date"><span>任务日期：</span><span class="task-date-text"></span><input type="text" placeholder="请按YYYY-MM-DD格式输入日期" class="task-date-input"></p>
+                <div class="detail-text-wrap">
+                    <p class="detail-text"></p>
+                    <div class="textarea-wrap">
+                        <textarea></textarea>
+                        <p><a href="#" class="save">保存修改</a><a href="#" class="cancel">取消</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
