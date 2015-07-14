@@ -1,7 +1,7 @@
 window.onload = function(){
 
-    var cates = [{title: "百度IFE项目",cateChilds:[{title:'task-1', tasks:[]},{title:'task-2', tasks:[]}],deletable: true},{title: "默认分类",cateChilds:[],deletable: false}];
-    var catesWrapper = $('.cates-wrapper');
+    var cates = [];
+    var catesWrapper =    $('.cates-wrapper');
     var tasksWrapper = $('.tasks-wrapper');
 
     function Task(title, date, content, done){
@@ -12,33 +12,42 @@ window.onload = function(){
         this.done = done;
     }
 
-    cates[0].cateChilds[0].tasks.push(new Task('to-do-1', '2015-04-28', 'testtesttest1', false));
-    cates[0].cateChilds[0].tasks.push(new Task('to-do-2', '2015-04-28', 'testtesttest2', true));
-    cates[0].cateChilds[0].tasks.push(new Task('to-do-3', '2015-04-29', 'testtesttest3', false));
-    cates[0].cateChilds[0].tasks.push(new Task('to-do-4', '2015-04-29', 'testtesttest4', false));
-    cates[0].cateChilds[1].tasks.push(new Task('to-do-6', '2015-05-29', 'testtesttest5', false));
-    cates[0].cateChilds[1].tasks.push(new Task('to-do-9', '2016-05-21', 'testtesttest6', false));
+    cates.push(new Cate("默认分类", false));
+    cates.push(new Cate("百度IFE项目2", true));
+    cates[0].cateChilds.push(new ChildCate('默认子分类', false));
+    cates[1].cateChilds.push(new ChildCate('task-1', true));
+    cates[1].cateChilds.push(new ChildCate('task-2', true));
+    cates[1].cateChilds[0].tasks.push(new Task('to-do-1', '2015-04-28', 'testtesttest1', false));
+    cates[1].cateChilds[0].tasks.push(new Task('to-do-2', '2015-04-28', 'testtesttest2', true));
+    cates[1].cateChilds[0].tasks.push(new Task('to-do-3', '2015-04-29', 'testtesttest3', false));
+    cates[1].cateChilds[0].tasks.push(new Task('to-do-4', '2015-04-29', 'testtesttest4', false));
+    cates[1].cateChilds[1].tasks.push(new Task('to-do-6', '2015-05-29', 'testtesttest5', false));
+    cates[1].cateChilds[1].tasks.push(new Task('to-do-9', '2016-05-21', 'testtesttest6', false));
 
     renderCates($('.cates-wrapper'));
 
-    function Cate(title){
+    function Cate(title, deletable){
         this.title = title;
         this.cateChilds = [];
+        this.deletable = deletable;
+        this.ID = IDgen('cate');
     }
 
-    function ChildCate(parent, title){
+    function ChildCate(title, deletable){
         this.title = title;
         this.tasks = [];
+        this.deletable = deletable;
+        this.ID = IDgen('childcate');
     }
 
     function renderCates(wrapper){
         var cateStr = '';
         for(var i=0, clen=cates.length;i<clen;i++){
-            var cateChildsStr = ''
+            var cateChildsStr = '';
             for(var j=0,tlen=cates[i].cateChilds.length;j<tlen;j++){
-                cateChildsStr += '<p class="cate cate-child" data-childCate="' + cates[i].cateChilds[j].title + '" data-cateParent="' + cates[i].title + '"><span class="task-ico icon"></span>' + cates[i].cateChilds[j].title + '(<span class="childcate-num">' + getCateNum(getChildCateByTitle(cates[i].cateChilds[j].title, cates[i].title)) + '</span>)</p>';
+                cateChildsStr += '<p class="cate cate-child" data-childCate="' + cates[i].cateChilds[j].title + '" data-cateParent="' + cates[i].title + '" cate-id="' + cates[i].cateChilds[j].ID + '"><span class="task-ico icon"></span>' + cates[i].cateChilds[j].title + '(<span class="childcate-num">' + getCateNum(getChildCateByTitle(cates[i].cateChilds[j].title, cates[i].title)) + '</span>)</p>';
             }
-            cateStr+='<div class="cate-folder"><p class="cate-folder-title" data-cate="' + cates[i].title + '"><span class="folder-ico icon"></span>' + cates[i].title + '(<span class="cate-num">' + getCateNum(getCateByTitle(cates[i].title)) + '</span>)</p><div class="cate-folder-content">' + cateChildsStr + '</div></div>';
+            cateStr+='<div class="cate-folder"><p class="cate-folder-title" data-cate="' + cates[i].title + '" cate-id="' + cates[i].ID + '"><span class="folder-ico icon"></span>' + cates[i].title + '(<span class="cate-num">' + getCateNum(getCateByTitle(cates[i].title)) + '</span>)</p><div class="cate-folder-content">' + cateChildsStr + '</div></div>';
         }
 
         wrapper.innerHTML = cateStr;
@@ -46,28 +55,27 @@ window.onload = function(){
         text(all_num, getAllNum());
     }
 
-    
-
     //点击分类列表
     $.delegate(catesWrapper, 'p', 'click', function(event) {
         var cateObj;
         if(event.target.getAttribute('data-cate')) {
-            cateObj = getCateByTitle(event.target.getAttribute('data-cate'));
+            //父
             tasksWrapper.setAttribute("isChild","0");
             tasksWrapper.setAttribute("cate",event.target.getAttribute('data-cate'));
             tasksWrapper.removeAttribute("parent");
-            renderTasks(cateObj, tasksWrapper, 'all', false);
+            renderTasks(event.target.getAttribute('data-cate'), undefined, tasksWrapper, 'all');
         }else if(event.target.getAttribute('data-childcate')){
-            cateObj = getChildCateByTitle(event.target.getAttribute('data-childcate'), event.target.getAttribute('data-cateparent'));
+            //子
             tasksWrapper.setAttribute("isChild","1");
             tasksWrapper.setAttribute("cate",event.target.getAttribute('data-childcate'));
             tasksWrapper.setAttribute("parent",event.target.getAttribute('data-cateparent'));
-            renderTasks(cateObj, tasksWrapper, 'all', true);
+            renderTasks(event.target.getAttribute('data-childcate'), event.target.getAttribute('data-cateparent'), tasksWrapper, 'all');
         }
         each(Array.prototype.slice.call(catesWrapper.getElementsByTagName('p')),function(elem){
             removeClass(elem, 'active');
         });
         addClass(event.target, 'active');
+        catesWrapper.setAttribute("activeid",event.target.getAttribute("cate-id"));
         each(Array.prototype.slice.call(taskNav.getElementsByTagName('li')),function(elem){
             removeClass(elem, 'active');
         });
@@ -79,6 +87,7 @@ window.onload = function(){
         var taskObj;
         if(event.target.getAttribute('task-id')){
             taskObj = getTaskById(event.target.getAttribute('task-id'));
+            tasksWrapper.setAttribute("activeId",event.target.getAttribute('task-id'));
             renderDetail(taskObj,event.target.getAttribute('task-id'));
         }
         if(hasClass(event.target,'task')){
@@ -87,7 +96,6 @@ window.onload = function(){
             });
             addClass(event.target, 'active');
         }
-        
     });
 
     var taskNav = $(".nav");
@@ -103,33 +111,40 @@ window.onload = function(){
         if(tasksWrapper.hasAttribute("cate")){
             if(hasClass(event.target, 'all')){
                 if(+tasksWrapper.getAttribute("isChild")){
-                    renderTasks(getChildCateByTitle(tasksWrapper.getAttribute("cate"),tasksWrapper.getAttribute("parent")), tasksWrapper, 'all', true);
+                    renderTasks(tasksWrapper.getAttribute("cate"), tasksWrapper.getAttribute("parent"), tasksWrapper, 'all');
                 }else{
-                    renderTasks(getCateByTitle(tasksWrapper.getAttribute("cate")) ,tasksWrapper, 'all', false);
+                    renderTasks(tasksWrapper.getAttribute("cate"), undefined, tasksWrapper, 'all');
                 }
             }else if(hasClass(event.target, 'unfinished')){
                 if(+tasksWrapper.getAttribute("isChild")){
-                    renderTasks(getChildCateByTitle(tasksWrapper.getAttribute("cate"),tasksWrapper.getAttribute("parent")), tasksWrapper, 'unfinished', true);
+                    renderTasks(tasksWrapper.getAttribute("cate"), tasksWrapper.getAttribute("parent"), tasksWrapper, 'unfinished');
                 }else{
-                    renderTasks(getCateByTitle(tasksWrapper.getAttribute("cate")) ,tasksWrapper, 'unfinished', false);
+                    renderTasks(tasksWrapper.getAttribute("cate"), undefined, tasksWrapper, 'unfinished');
                 }
             }else if(hasClass(event.target, 'finished')){
                 if(+tasksWrapper.getAttribute("isChild")){
-                    renderTasks(getChildCateByTitle(tasksWrapper.getAttribute("cate"),tasksWrapper.getAttribute("parent")), tasksWrapper, 'finished', true);
+                    renderTasks(tasksWrapper.getAttribute("cate"), tasksWrapper.getAttribute("parent"), tasksWrapper, 'finished');
                 }else{
-                    renderTasks(getCateByTitle(tasksWrapper.getAttribute("cate")) ,tasksWrapper, 'finished', false);
+                    renderTasks(tasksWrapper.getAttribute("cate"), undefined, tasksWrapper, 'finished');
                 }
             }
         }
     });
 
-    function renderTasks(cateObj, wrapper, status, isChild){
+    function renderTasks(cate, parent, wrapper, status, activeId){
+
         var tasksStr = '';
         var dateArr = [];
-        if(isChild){
+
+        tasksWrapper.setAttribute("cate", cate);
+        tasksWrapper.setAttribute("parent", parent);
+        tasksWrapper.setAttribute("status", status);
+
+        if(parent){
+            var cateObj = getChildCateByTitle(cate,parent);
             //针对子分类列表
             for(var i=0,len=cateObj.tasks.length;i<len;i++){
-                if(!dateArr.some(function(e,index,a){return e === cateObj.tasks[i].date})){
+                if(!dateArr.some(function(e,index,a){return e === cateObj.tasks[i].date;})){
                     dateArr.push(cateObj.tasks[i].date);
                 }
             }
@@ -169,6 +184,7 @@ window.onload = function(){
             }
             wrapper.innerHTML = tasksStr;
         }else{
+            var cateObj = getCateByTitle(cate);
             //针对父分类列表
             for(var i=0,len=cateObj.cateChilds.length;i<len;i++){
                 for(var j=0,tlen=cateObj.cateChilds[i].tasks.length;j<tlen;j++){
@@ -220,6 +236,15 @@ window.onload = function(){
             }
             wrapper.innerHTML = tasksStr;
         }
+
+        if(activeId){
+            var pArr = tasksWrapper.getElementsByTagName("p");
+            for(var i=0,len = pArr.length;i<len;i++){
+                if(pArr[i].hasAttribute("task-id") && pArr[i].getAttribute("task-id") === activeId){
+                    addClass(pArr[i],'active');
+                }
+            }
+        }
     }
 
     function renderDetail(task,id){
@@ -249,6 +274,14 @@ window.onload = function(){
     var finishBtn = $(".finish-ico");
     var cancelBtn = $(".cancel");
     var saveBtn = $(".save");
+    var createNewCateBtn = $(".add-cate");
+    var createNewTaskBtn = $(".add-task");
+    var newCateWrap = $(".addnewcate");
+    var closeBtn = $(".close");
+    var confirmNewCate = $(".addnewcate .confirm");
+    var cancelNewCate = $(".addnewcate .cancel");
+    var confirmNewTask = $(".new-task-wrap .confirm");
+    var cancelNewTask = $(".new-task-wrap .return");
 
     //编辑
     $.click(editBtn, function(){
@@ -288,15 +321,71 @@ window.onload = function(){
         task.content = $(".textarea-wrap textarea").value;
 
         renderDetail(task ,$(".details").getAttribute("taskid"));
+        updateTask();
     });
 
     //完成任务
     $.click(finishBtn, function(){
         if($(".details").hasAttribute("taskid")){
-            var task = getTaskById($(".details").getAttribute("taskid"));
+            var id = $(".details").getAttribute("taskid");
+            var task = getTaskById(id);
             task.done = true;
             updateNum();
+            console.log("updateTasks!!");
+            updateTask();
         }
+    });
+
+    //添加分类
+    $.click(createNewCateBtn, function(e){
+
+        newCateWrap.style.display = "block";
+
+        $("#new-cate-input").value = '';
+        $("#new-cate-parent").value = '0';
+
+        var optionStr = '<option value=0>无</option>';
+
+        for(var i=0,len=cates.length;i<len;i++){
+            optionStr += '<option value=' + cates[i].title + '>' + cates[i].title + '</option>';
+        }
+
+        $("#new-cate-parent").innerHTML = optionStr;
+
+    });
+
+    //确认添加
+    $.click(confirmNewCate, function(e){
+
+        var newCate = trim($("#new-cate-input").value);
+        var parent = $("#new-cate-parent").value;
+
+        if(parent === '0'){
+            cates.push(new Cate(newCate));
+        }else{
+            for(var i=0,len=cates.length;i<len;i++){
+                if(cates[i].title === parent){
+                    cates[i].cateChilds.push(new ChildCate(newCate));
+                }
+            }
+        }
+
+        renderCates($('.cates-wrapper'));
+        newCateWrap.style.display = "none";
+
+    });
+
+    $.click(cancelNewCate, function(e){
+        newCateWrap.style.display = "none";
+    });
+
+    //关闭添加分类
+    $.click(closeBtn, function(e){
+        newCateWrap.style.display = "none";
+    });
+
+    $.click(createNewTaskBtn, function(e){
+        $(".new-task-wrap").style.display = "block";
     });
 
     //获取某个分类列表的未完成任务数量
@@ -328,7 +417,8 @@ window.onload = function(){
 
         var count = 0;
         for(var i=0,len=cates.length;i<len;i++){
-            for(var j=0,len=cates[i].cateChilds.length;j<len;j++){
+            console.log(i,len);
+            for(var j=0,clen=cates[i].cateChilds.length;j<clen;j++){
                 for(var k=0,tlen=cates[i].cateChilds[j].tasks.length;k<tlen;k++){
                     if(cates[i].cateChilds[j].tasks[k].done === false){
                         count++;
@@ -336,7 +426,6 @@ window.onload = function(){
                 }
             }
         }
-
         return count;
     }
 
@@ -347,14 +436,17 @@ window.onload = function(){
             for(var j=0,len=cates[i].cateChilds.length;j<len;j++){
                 text($("[data-childcate=" + cates[i].cateChilds[j].title + "] .childcate-num"), getCateNum(cates[i].cateChilds[j]));
             }
-            console.log($("[data-cate=" + cates[i].title + "] .cate-num"));
             text($("[data-cate=" + cates[i].title + "] .cate-num"), getCateNum(cates[i]));
         }
     }
 
     //更新任务列表页状态
-    function updateTaskActive(){
-        
+    function updateTask(){
+        var cate = tasksWrapper.getAttribute("cate");
+        var parent = tasksWrapper.getAttribute("parent")==="undefined"?undefined:tasksWrapper.getAttribute("parent");
+        var status = tasksWrapper.getAttribute("status");
+
+        renderTasks(cate, parent, tasksWrapper, status, tasksWrapper.getAttribute("activeId"));
     }
 
     //获取父分类列表
@@ -366,7 +458,6 @@ window.onload = function(){
         }
     }
 
-    //console.log(getCateByTitle("百度IFE项目"));
     //获取子分类列表
     function getChildCateByTitle(title, parentTitle){
         for(var i=0,len=cates.length;i<len;i++){
@@ -375,6 +466,25 @@ window.onload = function(){
                     if(cates[i].cateChilds[j].title === title){
                         return cates[i].cateChilds[j];
                     }
+                }
+            }
+        }
+    }
+
+    //根据ID获取分类列表
+    function getCateById(ID){
+        if(id.length>17){
+            for(var i=0,len=cates.length;i<len;i++){
+                for(var j=0,clen=cates[i].cateChilds.length;j<clen;j++){
+                    if(cates[i].cateChilds[j].ID === ID){
+                        return cates[i].cateChilds[j];
+                    }
+                }
+            }
+        }else {
+            for(var i=0,len=cates.length;i<len;i++){
+                if(cates[i].ID === ID){
+                    return cates[i];
                 }
             }
         }
@@ -397,4 +507,4 @@ window.onload = function(){
         return prefix + Math.floor(Math.random().toFixed(10)*1e10+Date.now()/1e3);
     }
 
-}
+};

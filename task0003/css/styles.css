@@ -236,18 +236,22 @@ body {
     padding: 10px;
     min-height: 200px;
 }
-.details .textarea-wrap {
+.details .textarea-wrap,
+.details .new-task-wrap {
     width: 100%;
     display: none;
 }
-.details .textarea-wrap textarea {
+.details .textarea-wrap textarea,
+.details .new-task-wrap textarea {
     width: 100%;
     height: 150px;
 }
-.details .textarea-wrap p {
+.details .textarea-wrap p,
+.details .new-task-wrap p {
     margin-top: 20px;
 }
-.details .textarea-wrap a {
+.details .textarea-wrap a,
+.details .new-task-wrap a {
     margin: 0 10px;
     padding: 0.3em;
     border: 1px solid #666;
@@ -289,5 +293,41 @@ body {
     width: 25px;
     height: 25px;
     background: url(../img/edit.png) no-repeat;
+    cursor: pointer;
+}
+.addnewcate {
+    display: none;
+    position: fixed;
+    margin: auto;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 300px;
+    height: 140px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    z-index: 10;
+    overflow: hidden;
+}
+.addnewcate .row {
+    margin: 20px 0;
+    padding: 0 20px;
+}
+.addnewcate label {
+    display: inline-block;
+    width: 70px;
+}
+.addnewcate .ft {
+    text-align: center;
+}
+.addnewcate .ft button {
+    margin: 0 5px;
+    padding: 5px;
+}
+.addnewcate .close {
+    position: absolute;
+    right: 10px;
+    top: 5px;
     cursor: pointer;
 }

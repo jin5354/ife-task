@@ -385,20 +385,20 @@ function text(element, str){
 
 
     if(typeof element.textContent === 'string'){
-        if(str){
+        if(str !== undefined){
             element.textContent = str;
         }else{
             return element.textContent;
         }
     }else{
         if(element.firstChild){
-            if(str){
+            if(str !== undefined){
                 element.firstChild.nodeValue = str;
             }else{
                 return element.firstChild.nodeValue;
             }
         }else{
-            if(str){
+            if(str !== undefined){
                 var textNode = document.createTextNode(str);
                 element.appendChild(textNode);
             }
